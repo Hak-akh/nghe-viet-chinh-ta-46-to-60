@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocean Spelling Adventure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00bfa5; /* Teal */
+            --primary-hover: #1de9b6;
+            --container-bg: rgba(255, 255, 255, 0.1);
+            --text-color: #f0fdfa;
+            --light-text: #a7f3d0;
+            --success-color: #69f0ae;
+            --error-color: #ff8a80;
+            --border-color: rgba(0, 191, 165, 0.4);
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(to top, #042f2e, #0c4b4a);
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            overflow: hidden; /* Hide overflow for bubbles */
+            color: var(--text-color);
+        }
+
+        .bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            top: 0;
+            left: 0;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -100px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            opacity: 0.5;
+            animation: rise 10s infinite ease-in;
+        }
+
+        .bubble:nth-child(1) { left: 10%; animation-duration: 8s; }
+        .bubble:nth-child(2) { left: 20%; animation-duration: 5s; animation-delay: 1s; }
+        .bubble:nth-child(3) { left: 35%; animation-duration: 12s; }
+        .bubble:nth-child(4) { left: 50%; animation-duration: 6s; animation-delay: 2s; }
+        .bubble:nth-child(5) { left: 65%; animation-duration: 9s; }
+        .bubble:nth-child(6) { left: 80%; animation-duration: 7s; animation-delay: 1s; }
+        .bubble:nth-child(7) { left: 90%; animation-duration: 10s; }
+
+        @keyframes rise {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-1080px); }
+        }
+
+        #game-container {
+            text-align: center;
+            background: var(--container-bg);
+            padding: 25px 30px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            width: 90%;
+            max-width: 680px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            font-family: 'Baloo 2', cursive;
+            font-size: clamp(30px, 7vw, 44px);
+            margin-bottom: 0px;
+            color: white;
+            text-shadow: 0 0 10px var(--primary-color);
+        }
+        
+        .subtitle {
+            font-family: 'Quicksand', sans-serif;
+            font-size: clamp(16px, 4vw, 18px);
+            color: var(--light-text);
+            margin-top: -5px;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        p {
+            font-size: clamp(18px, 4vw, 20px);
+            line-height: 1.6;
+            margin-top: 0;
+            font-weight: 500;
+        }
+        
+        .instruction-vi {
+            font-size: clamp(15px, 3.5vw, 17px);
+            color: var(--light-text);
+            margin-top: 4px;
+            display: block;
+        }
+
+        input[type="text"] {
+            padding: 14px 20px;
+            font-size: clamp(18px, 4vw, 20px);
+            width: 100%;
+            max-width: 480px;
+            margin: 20px 0;
+            box-sizing: border-box;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            background-color: rgba(0,0,0,0.2);
+            border: 2px solid var(--border-color);
+            color: var(--text-color);
+            border-radius: 15px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 15px rgba(0, 191, 165, 0.5);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: clamp(16px, 4vw, 18px);
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            touch-action: manipulation;
+            font-family: 'Baloo 2', cursive;
+            font-weight: 700;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-3px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+
+        #hint {
+            color: var(--light-text);
+            margin-top: 15px;
+            font-size: clamp(16px, 4vw, 18px);
+            user-select: none;
+            line-height: 1.5;
+            min-height: 25px;
+        }
+
+        #completion, #result {
+            font-size: clamp(18px, 4vw, 22px);
+            font-weight: 700;
+            margin-top: 15px;
+            min-height: 28px;
+        }
+        
+        #result.correct { color: var(--success-color); }
+        #result.incorrect { color: var(--error-color); }
+
+        .correct-bubble {
+            position: absolute;
+            background: var(--primary-hover);
+            border-radius: 50%;
+            opacity: 0.8;
+            animation: bubble-up 1.2s ease-out forwards;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        @keyframes bubble-up {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-200px) scale(var(--s));
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bubbles">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+    </div>
+    <div id="game-container">
+        <h1>Ocean Spelling Adventure</h1>
+        <p class="subtitle">Structures 45 - 60</p>
+        <p>Click Start to begin the game!<span class="instruction-vi">Nhấn Bắt đầu để chơi!</span></p>
+        <button onclick="startGame()">Start</button>
+    </div>
+
+    <script>
+        const sentences = [
+            { english: "After she had cleaned the house, she took a nap.", vietnamese: "Sau khi cô ấy dọn nhà xong, cô ấy chợp mắt." },
+            { english: "After we had eaten dinner, we watched a movie.", vietnamese: "Sau khi chúng tôi ăn tối xong, chúng tôi xem phim." },
+            { english: "After he had studied, he went out with friends.", vietnamese: "Sau khi học bài xong, anh ấy đi chơi với bạn." },
+            { english: "After they had finished the test, they left the room.", vietnamese: "Sau khi làm bài kiểm tra xong, họ rời khỏi phòng." },
+            { english: "After I had fed the cat, I went to school.", vietnamese: "Sau khi cho mèo ăn xong, tôi đi học." },
+            { english: "The beach is crowded with people every summer.", vietnamese: "Bãi biển rất đông người mỗi mùa hè." },
+            { english: "The street was crowded with cars yesterday.", vietnamese: "Con đường hôm qua đông xe cộ." },
+            { english: "The market is crowded with shoppers.", vietnamese: "Chợ rất đông người mua sắm." },
+            { english: "The stadium was crowded with fans.", vietnamese: "Sân vận động đông kín người hâm mộ." },
+            { english: "The park is crowded with children every weekend.", vietnamese: "Công viên cuối tuần nào cũng đông trẻ con." },
+            { english: "The basket is full of apples.", vietnamese: "Cái giỏ đầy táo." },
+            { english: "Her heart is full of love.", vietnamese: "Trái tim cô ấy đầy yêu thương." },
+            { english: "The room is full of furniture.", vietnamese: "Căn phòng đầy đồ nội thất." },
+            { english: "My bag is full of books.", vietnamese: "Cặp của tôi đầy sách." },
+            { english: "This box is full of toys.", vietnamese: "Cái hộp này đầy đồ chơi." },
+            { english: "He seems tired today.", vietnamese: "Hôm nay anh ấy có vẻ mệt." },
+            { english: "She seems happy with her gift.", vietnamese: "Cô ấy có vẻ vui với món quà." },
+            { english: "They seem excited about the trip.", vietnamese: "Họ có vẻ háo hức về chuyến đi." },
+            { english: "You seem sad. What's wrong?", vietnamese: "Bạn có vẻ buồn. Có chuyện gì vậy?" },
+            { english: "The dog seems hungry.", vietnamese: "Con chó có vẻ đói." },
+            { english: "Everyone came except for John.", vietnamese: "Mọi người đều đến, trừ John." },
+            { english: "Apart from English, she speaks French.", vietnamese: "Ngoài tiếng Anh, cô ấy còn nói tiếng Pháp." },
+            { english: "I like all fruits except for bananas.", vietnamese: "Tôi thích tất cả các loại trái cây trừ chuối." },
+            { english: "Apart from his job, he also studies at night.", vietnamese: "Ngoài công việc, anh ấy còn học ban đêm." },
+            { english: "Except for this problem, everything is fine.", vietnamese: "Trừ vấn đề này ra, mọi thứ đều ổn." },
+            { english: "As soon as I got home, it started to rain.", vietnamese: "Ngay khi tôi về đến nhà, trời bắt đầu mưa." },
+            { english: "As soon as she finishes work, she calls her mom.", vietnamese: "Ngay khi xong việc, cô ấy gọi cho mẹ." },
+            { english: "As soon as the bell rang, the students left.", vietnamese: "Ngay khi chuông reo, học sinh rời khỏi lớp." },
+            { english: "As soon as he sees me, he smiles.", vietnamese: "Ngay khi thấy tôi, anh ấy cười." },
+            { english: "As soon as we arrive, we’ll start the meeting.", vietnamese: "Ngay khi chúng tôi đến, chúng tôi sẽ bắt đầu họp." },
+            { english: "She is afraid of snakes.", vietnamese: "Cô ấy sợ rắn." },
+            { english: "I’m afraid of flying.", vietnamese: "Tôi sợ đi máy bay." },
+            { english: "They are afraid of the dark.", vietnamese: "Họ sợ bóng tối." },
+            { english: "He is afraid of losing his phone.", vietnamese: "Anh ấy sợ mất điện thoại." },
+            { english: "We are afraid of getting lost.", vietnamese: "Chúng tôi sợ bị lạc." },
+            { english: "I could hardly hear the music.", vietnamese: "Tôi hầu như không nghe được nhạc." },
+            { english: "She can hardly walk in these shoes.", vietnamese: "Cô ấy hầu như không đi được trong đôi giày này." },
+            { english: "We could hardly finish the test in time.", vietnamese: "Chúng tôi hầu như không kịp làm bài kiểm tra." },
+            { english: "He could hardly speak after running.", vietnamese: "Anh ấy hầu như không nói nổi sau khi chạy." },
+            { english: "They can hardly believe their eyes.", vietnamese: "Họ hầu như không tin vào mắt mình." },
+            { english: "I have difficulty learning French.", vietnamese: "Tôi gặp khó khăn khi học tiếng Pháp." },
+            { english: "She had difficulty in finding the place.", vietnamese: "Cô ấy gặp khó khăn khi tìm chỗ đó." },
+            { english: "We have difficulty understanding this lesson.", vietnamese: "Chúng tôi gặp khó khăn trong việc hiểu bài này." },
+            { english: "They had difficulty climbing the mountain.", vietnamese: "Họ gặp khó khăn khi leo núi." },
+            { english: "He has difficulty speaking in public.", vietnamese: "Anh ấy gặp khó khăn khi nói trước đám đông." },
+            { english: "I suggest we go to the beach.", vietnamese: "Tôi gợi ý chúng ta đi biển." },
+            { english: "She suggests that he see a doctor.", vietnamese: "Cô ấy gợi ý anh ấy đi khám bác sĩ." },
+            { english: "The teacher suggested we read more books.", vietnamese: "Cô giáo gợi ý chúng tôi đọc thêm sách." },
+            { english: "I suggest you take a rest.", vietnamese: "Tôi gợi ý bạn nghỉ ngơi." },
+            { english: "They suggested that we leave early.", vietnamese: "Họ gợi ý chúng tôi rời đi sớm." },
+            { english: "This is the school in which I studied.", vietnamese: "Đây là ngôi trường nơi tôi từng học." },
+            { english: "The day on which we met was special.", vietnamese: "Ngày mà chúng tôi gặp nhau rất đặc biệt." },
+            { english: "That's the house where he was born.", vietnamese: "Đó là ngôi nhà nơi anh ấy sinh ra." },
+            { english: "I remember the time at which we first met.", vietnamese: "Tôi nhớ thời điểm chúng ta gặp nhau lần đầu." },
+            { english: "Summer is the season in which we travel the most.", vietnamese: "Mùa hè là mùa chúng tôi đi du lịch nhiều nhất." },
+            { english: "I can’t put up with this noise anymore.", vietnamese: "Tôi không thể chịu đựng tiếng ồn này nữa." },
+            { english: "She puts up with his bad habits.", vietnamese: "Cô ấy chịu đựng thói xấu của anh ta." },
+            { english: "They put up with the heat during summer.", vietnamese: "Họ chịu đựng cái nóng suốt mùa hè." },
+            { english: "We have to put up with traffic jams every day.", vietnamese: "Chúng tôi phải chịu cảnh kẹt xe mỗi ngày." },
+            { english: "He puts up with his brother’s jokes.", vietnamese: "Anh ấy chịu đựng mấy trò đùa của em trai." },
+            { english: "Make use of your time wisely.", vietnamese: "Hãy tận dụng thời gian của bạn một cách khôn ngoan." },
+            { english: "We made use of old boxes for storage.", vietnamese: "Chúng tôi tận dụng hộp cũ để cất đồ." },
+            { english: "She made use of her skills to find a job.", vietnamese: "Cô ấy tận dụng kỹ năng để tìm việc." },
+            { english: "They made use of the free tickets.", vietnamese: "Họ tận dụng vé miễn phí." },
+            { english: "Let’s make use of this sunny day.", vietnamese: "Hãy tận dụng ngày nắng đẹp này." },
+            { english: "He got tired after walking all day.", vietnamese: "Anh ấy mệt sau khi đi bộ cả ngày." },
+            { english: "She got married last year.", vietnamese: "Cô ấy đã kết hôn năm ngoái." },
+            { english: "The food got burned.", vietnamese: "Thức ăn bị cháy." },
+            { english: "We got lost in the forest.", vietnamese: "Chúng tôi bị lạc trong rừng." },
+            { english: "I got excited about the trip.", vietnamese: "Tôi trở nên háo hức về chuyến đi." },
+            { english: "She is making good progress in English.", vietnamese: "Cô ấy đang tiến bộ tốt trong môn tiếng Anh." },
+            { english: "We made progress on the project.", vietnamese: "Chúng tôi đã có tiến triển trong dự án." },
+            { english: "He has made a lot of progress this year.", vietnamese: "Anh ấy đã tiến bộ nhiều trong năm nay." },
+            { english: "The baby is making progress in walking.", vietnamese: "Em bé đang tiến bộ trong việc tập đi." },
+            { english: "I hope to make more progress next month.", vietnamese: "Tôi hy vọng sẽ tiến bộ hơn vào tháng sau." }
+        ];
+
+        let currentSentenceIndex = 0;
+        let completedCount = 0;
+        let isPlaying = false;
+        let autoPlayInterval;
+        let wrongAttempts = 0;
+        let isChecking = false;
+        const TOTAL_SENTENCES = sentences.length;
+
+        function createBubbleExplosion() {
+            const gameContainer = document.getElementById('game-container');
+            const input = document.getElementById('userInput');
+            if(!gameContainer || !input) return;
+
+            const inputRect = input.getBoundingClientRect();
+            const containerRect = gameContainer.getBoundingClientRect();
+            const startX = inputRect.left - containerRect.left + inputRect.width / 2;
+            const startY = inputRect.top - containerRect.top + inputRect.height / 2;
+
+            for (let i = 0; i < 40; i++) { // Increased bubble count
+                const particle = document.createElement('div');
+                particle.className = 'correct-bubble';
+                const size = Math.random() * 25 + 5; // Slightly larger bubbles
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${startX + (Math.random() - 0.5) * 60}px`;
+                particle.style.top = `${startY}px`;
+                particle.style.animationDelay = `${Math.random() * 0.3}s`;
+                particle.style.setProperty('--s', `${Math.random() * 1 + 1}`); // Randomize scale
+                
+                gameContainer.appendChild(particle);
+                setTimeout(() => particle.remove(), 1200);
+            }
+        }
+
+        function playSentence() {
+            if (!isPlaying && sentences[currentSentenceIndex]) {
+                isPlaying = true;
+                const utterance = new SpeechSynthesisUtterance(sentences[currentSentenceIndex].english);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                utterance.onend = () => { isPlaying = false; };
+                speechSynthesis.speak(utterance);
+            }
+        }
+        
+        function startAutoPlay() {
+            if (autoPlayInterval) clearInterval(autoPlayInterval);
+            autoPlayInterval = setInterval(() => { if (!isPlaying) playSentence(); }, 5000);
+        }
+
+        function stopAutoPlay() {
+            if (autoPlayInterval) clearInterval(autoPlayInterval);
+        }
+        
+        function normalizeApostrophe(str) {
+            return str.replace(/’|‘/g, "'");
+        }
+
+        function checkAnswer() {
+            if (isChecking) return; 
+
+            const userInput = document.getElementById('userInput').value.trim();
+            const result = document.getElementById('result');
+            const currentSentence = sentences[currentSentenceIndex].english;
+            
+            const normalizedUserInput = normalizeApostrophe(userInput);
+            const normalizedCurrentSentence = normalizeApostrophe(currentSentence);
+
+            const isCorrect = normalizedUserInput === normalizedCurrentSentence;
+
+            if (isCorrect) {
+                isChecking = true; 
+                stopAutoPlay();
+                result.textContent = "Correct!";
+                result.className = 'correct';
+                createBubbleExplosion();
+                
+                if (wrongAttempts <= 1) {
+                    completedCount++;
+                }
+                
+                wrongAttempts = 0; 
+                
+                setTimeout(() => {
+                    currentSentenceIndex++;
+                    if (currentSentenceIndex >= TOTAL_SENTENCES) {
+                        document.getElementById('game-container').innerHTML = `<h1>Congratulations! 🐠</h1><p>You scored ${completedCount} out of ${TOTAL_SENTENCES}!</p><button onclick="resetGame()">Play Again</button>`;
+                    } else {
+                         updateGameScreen();
+                         playSentence();
+                         startAutoPlay();
+                    }
+                    isChecking = false; 
+                }, 2000);
+            } else {
+                wrongAttempts++;
+                result.textContent = `Incorrect, try again! (${3 - wrongAttempts} attempts left)`;
+                result.className = 'incorrect';
+                if (wrongAttempts >= 3) {
+                    isChecking = true; 
+                    stopAutoPlay();
+                    wrongAttempts = 0; 
+                    result.textContent = "Moving to the next sentence...";
+                    setTimeout(() => {
+                        currentSentenceIndex++;
+                        if (currentSentenceIndex >= TOTAL_SENTENCES) {
+                            document.getElementById('game-container').innerHTML = `<h1>Game Over!</h1><p>You scored ${completedCount} out of ${TOTAL_SENTENCES}.</p><button onclick="resetGame()">Play Again</button>`;
+                        } else {
+                            updateGameScreen();
+                            playSentence();
+                            startAutoPlay();
+                        }
+                        isChecking = false; 
+                    }, 2000);
+                }
+            }
+        }
+        
+        function updateGameScreen() {
+             if (document.getElementById('userInput')) {
+                document.getElementById('userInput').value = '';
+                document.getElementById('hint').textContent = '';
+                document.getElementById('result').textContent = '';
+                document.getElementById('completion').textContent = `Score: ${completedCount}/${TOTAL_SENTENCES}`;
+             }
+        }
+
+        function showHint() {
+            const hintData = sentences[currentSentenceIndex];
+            document.getElementById('hint').innerHTML = `Hint: ${hintData.english}<br>(${hintData.vietnamese})`;
+        }
+        
+        function clearHint() {
+            const hintEl = document.getElementById('hint');
+            if (hintEl) {
+                hintEl.innerHTML = '';
+            }
+        }
+
+        function startGame() {
+            wrongAttempts = 0;
+            isChecking = false;
+            document.getElementById('game-container').innerHTML = `
+                <h1>Ocean Spelling Adventure</h1>
+                <p class="subtitle">Structures 45 - 60</p>
+                <p>Listen and type what you hear!<span class="instruction-vi">Hãy lắng nghe và gõ lại câu bạn nghe được.</span></p>
+                <input type="text" id="userInput" placeholder="Type the sentence here...">
+                <div class="button-group">
+                    <button onclick="playSentence()">&#9658; Play Sound</button>
+                    <button onclick="checkAnswer()">Check</button>
+                    <button onclick="showHint()">Hint</button>
+                    <button onclick="resetGame()">Reset Game</button>
+                </div>
+                <p id="completion">Score: ${completedCount}/${TOTAL_SENTENCES}</p>
+                <p id="hint"></p>
+                <p id="result"></p>
+            `;
+            document.getElementById('userInput').addEventListener('keypress', handleKeyPress);
+            document.getElementById('userInput').addEventListener('focus', clearHint);
+            document.getElementById('hint').addEventListener('copy', (event) => event.preventDefault());
+
+            playSentence();
+            startAutoPlay();
+        }
+
+        function resetGame() {
+            stopAutoPlay();
+            currentSentenceIndex = 0;
+            completedCount = 0;
+            wrongAttempts = 0;
+            speechSynthesis.cancel();
+            isPlaying = false;
+            isChecking = false;
+            
+            document.getElementById('game-container').innerHTML = `
+                <h1>Ocean Spelling Adventure</h1>
+                <p class="subtitle">Structures 45 - 60</p>
+                <p>Click Start to begin the game!<span class="instruction-vi">Nhấn Bắt đầu để chơi!</span></p>
+                <button onclick="startGame()">Start</button>
+            `;
+        }
+        
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+    </script>
+</body>
+</html>
